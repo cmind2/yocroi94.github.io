@@ -1,0 +1,721 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>YOCROI PCS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Figtree:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Concept : atelier de déblocage. Le configurateur en trois étapes est la pièce centrale de la page.
+   Le repère tricolore en diagonale (vert, jaune, rouge) rappelle le drapeau du Congo. */
+:root{
+  --bg:#F1F4EF;
+  --surface:#FFFFFF;
+  --surface-2:#E7ECE5;
+  --ink:#0F2318;
+  --ink-2:#465A4D;
+  --line:#CAD5C8;
+  --accent:#0A7B45;
+  --accent-ink:#FFFFFF;
+  --accent-soft:#D8EDDF;
+  --flag-y:#F5C400;
+  --flag-r:#D62E2E;
+  --warn:#6B4400;
+  --warn-soft:#FFF0C7;
+  --shadow:0 1px 2px rgba(15,35,24,.06),0 10px 28px rgba(15,35,24,.08);
+  --font-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --font-body:"Figtree","Segoe UI",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1610;--surface:#12221A;--surface-2:#1A2F23;--ink:#E8F0E9;--ink-2:#A2B7A8;--line:#2A4234;
+    --accent:#46C98B;--accent-ink:#06150D;--accent-soft:#17402B;--flag-r:#E5483F;
+    --warn:#F5D78A;--warn-soft:#3A2D0B;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1610;--surface:#12221A;--surface-2:#1A2F23;--ink:#E8F0E9;--ink-2:#A2B7A8;--line:#2A4234;
+  --accent:#46C98B;--accent-ink:#06150D;--accent-soft:#17402B;--flag-r:#E5483F;
+  --warn:#F5D78A;--warn-soft:#3A2D0B;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--font-body);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--font-display);line-height:1.12;letter-spacing:-.015em;text-wrap:balance;margin:0}
+p{margin:0}
+a{color:inherit}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+
+.wrap{width:100%;max-width:72rem;margin-inline:auto;padding-inline:1rem}
+.ico{width:1.25rem;height:1.25rem;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.label{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:.9rem;box-shadow:var(--shadow)}
+
+/* En-tête */
+.flagbar{height:6px;background:linear-gradient(90deg,var(--accent) 0 33.34%,var(--flag-y) 33.34% 66.67%,var(--flag-r) 66.67%)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.top__in{display:flex;align-items:center;gap:1rem;min-height:3.5rem}
+.brand{display:flex;align-items:center;gap:.6rem;text-decoration:none;font-family:var(--font-display);font-weight:800;font-size:1.15rem;letter-spacing:.01em;white-space:nowrap}
+.brand__mark{width:1.75rem;height:1.75rem;border-radius:.4rem;flex:none;background:linear-gradient(135deg,var(--accent) 0 34%,var(--flag-y) 34% 67%,var(--flag-r) 67%)}
+.brand__pcs{color:var(--accent)}
+.nav{display:none;gap:1.25rem;margin-left:auto;font-size:.9rem;font-weight:500}
+.nav a{text-decoration:none;color:var(--ink-2)}
+.nav a:hover{color:var(--ink)}
+.top__act{display:flex;gap:.5rem;margin-left:auto;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.75rem;padding:.55rem 1.1rem;border-radius:.6rem;border:1px solid transparent;font-weight:600;text-decoration:none;cursor:pointer;line-height:1.2;background:none}
+.btn--pri{background:var(--accent);color:var(--accent-ink)}
+.btn--pri:hover{filter:brightness(1.08)}
+.btn--ghost{border-color:var(--line);color:var(--ink);background:var(--surface)}
+.btn--ghost:hover{border-color:var(--ink-2)}
+.btn--icon{width:2.75rem;padding:0}
+.btn__txt{display:none}
+@media (min-width:30rem){.btn__txt{display:inline}.btn--cta{padding-inline:1.1rem}.btn--cta.btn--icon{width:auto}}
+@media (min-width:48rem){.nav{display:flex}.top__act{margin-left:0}}
+
+/* Hero */
+.hero{padding-block:2.25rem 1.5rem}
+.hero__grid{display:grid;gap:2rem;align-items:center}
+@media (min-width:56rem){.hero__grid{grid-template-columns:1.15fr .85fr;gap:3rem}}
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;color:var(--accent)}
+.hero h1{font-size:clamp(2rem,5.2vw,3.4rem);font-weight:800;margin-block:.75rem 1rem}
+.hero__lead{font-size:1.1rem;color:var(--ink-2);max-width:34rem}
+.hero__cta{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}
+.facts{display:flex;flex-wrap:wrap;gap:.4rem 1.25rem;margin:1.5rem 0 0;padding:0;list-style:none;font-size:.9rem;color:var(--ink-2)}
+.facts li{display:flex;align-items:center;gap:.4rem}
+.facts .ico{color:var(--accent);width:1.05rem;height:1.05rem}
+
+.scale{padding:1.25rem 1.5rem 1rem;min-width:0}
+.scale__title{display:flex;justify-content:space-between;gap:.75rem;align-items:baseline;flex-wrap:wrap;margin-bottom:1.1rem}
+.scale__title h2{font-size:1.15rem;font-weight:700}
+.scale__title span{font-size:.78rem;color:var(--ink-2)}
+.scale__item{margin-bottom:.9rem}
+.scale__head{display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;font-size:.9rem;margin-bottom:.35rem}
+.scale__head b{font-weight:700}
+.scale__track{position:relative;height:.9rem;border-radius:.3rem;background:var(--surface-2)}
+.scale__track i{position:absolute;top:0;bottom:0;left:0;border-radius:.3rem}
+.scale__axis{position:relative;height:1.5rem;margin-top:.6rem;border-top:1px solid var(--line)}
+.scale__axis span{position:absolute;top:.4rem;transform:translateX(-50%);font-family:var(--font-mono);font-size:.7rem;color:var(--ink-2);white-space:nowrap}
+.scale__axis span::before{content:"";position:absolute;left:50%;top:-.4rem;height:.35rem;border-left:1px solid var(--ink-2)}
+
+/* Sections */
+.section{padding-block:2.25rem}
+.section__head{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem;max-width:42rem}
+.section__head h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:800}
+.section__head p{color:var(--ink-2)}
+[id]{scroll-margin-top:4.5rem}
+
+/* Configurateur */
+.cfg{padding:1rem;min-width:0}
+@media (min-width:48rem){.cfg{padding:1.75rem}}
+.step{display:grid;gap:.9rem;padding-block:1.25rem;border-top:1px solid var(--line);min-width:0}
+.step:first-child{border-top:0;padding-top:0}
+.step:last-child{padding-bottom:0}
+.step__head{display:flex;align-items:baseline;gap:.75rem}
+.step__n{font-family:var(--font-mono);font-weight:600;font-size:.8rem;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:.05rem .55rem}
+.step__t{font-family:var(--font-display);font-weight:700;font-size:1.2rem}
+
+.seg{display:grid;gap:.75rem;grid-template-columns:1fr 1fr}
+.seg__b{display:flex;align-items:center;gap:.8rem;text-align:left;padding:.9rem 1rem;border:1.5px solid var(--line);border-radius:.8rem;background:var(--surface);cursor:pointer;min-width:0}
+.seg__b .ico{width:1.75rem;height:1.75rem}
+.seg__b strong{display:block;font-family:var(--font-display);font-size:1.15rem}
+.seg__b small{display:block;color:var(--ink-2);font-size:.8rem;line-height:1.3}
+.seg__b[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+@media (max-width:30rem){.seg__b{flex-direction:column;align-items:flex-start;gap:.4rem}}
+
+.svcs{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fill,minmax(min(100%,17rem),1fr))}
+.svc{display:grid;grid-template-columns:auto 1fr;gap:.15rem .8rem;align-items:start;text-align:left;padding:.85rem .95rem;border:1.5px solid var(--line);border-radius:.8rem;background:var(--surface);cursor:pointer;min-width:0}
+.svc__ico{grid-row:span 3;display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:.6rem;background:var(--surface-2);color:var(--accent)}
+.svc__t{font-weight:700;line-height:1.25}
+.svc__d{font-size:.85rem;color:var(--ink-2);line-height:1.4}
+.svc__p{font-family:var(--font-mono);font-size:.78rem;font-weight:500;margin-top:.2rem}
+.svc[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.svc[aria-checked="true"] .svc__ico{background:var(--accent);color:var(--accent-ink)}
+
+.field{display:grid;gap:.45rem}
+.chips{display:flex;flex-wrap:wrap;gap:.45rem}
+.chip{min-height:2.25rem;padding:.3rem .8rem;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:.88rem;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.input{width:100%;min-height:2.75rem;padding:.55rem .8rem;border:1.5px solid var(--line);border-radius:.6rem;background:var(--surface);color:var(--ink)}
+.search{position:relative}
+.search .ico{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--ink-2);pointer-events:none}
+.search .input{padding-left:2.5rem}
+
+.note{display:flex;gap:.6rem;align-items:flex-start;padding:.7rem .9rem;border-radius:.6rem;background:var(--warn-soft);color:var(--warn);font-size:.9rem}
+.note .ico{margin-top:.1rem}
+.hint{display:flex;gap:.5rem;align-items:center;color:var(--ink-2);font-size:.9rem}
+.hint .ico{color:var(--accent)}
+.count{font-size:.85rem;color:var(--ink-2)}
+.empty{padding:1rem;border:1px dashed var(--line);border-radius:.8rem;color:var(--ink-2)}
+
+.grid{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fill,minmax(min(100%,9rem),1fr))}
+.tile{position:relative;display:grid;gap:.15rem;align-content:start;padding:.8rem .9rem;border:1.5px solid var(--line);border-radius:.8rem;background:var(--surface);text-decoration:none;min-width:0;transition:border-color .15s,transform .15s}
+.tile:hover{border-color:var(--accent);transform:translateY(-1px)}
+.tile__n{font-family:var(--font-display);font-weight:700;line-height:1.2;padding-right:1.4rem}
+.tile__y{font-size:.75rem;color:var(--ink-2)}
+.tile__p{margin-top:.35rem;font-weight:600;font-size:.9rem}
+.tile .ico{position:absolute;right:.7rem;top:.8rem;width:1rem;height:1rem;color:var(--accent)}
+
+/* Tarifs */
+.tabs{display:inline-flex;gap:.25rem;padding:.25rem;background:var(--surface-2);border-radius:.7rem;margin-bottom:1rem}
+.tab{min-height:2.5rem;padding:.35rem 1rem;border:0;border-radius:.5rem;background:transparent;cursor:pointer;font-weight:600;color:var(--ink-2)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.tbl-wrap{overflow:auto;max-height:30rem;border:1px solid var(--line);border-radius:.8rem;background:var(--surface)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:.85rem}
+th,td{padding:.55rem .75rem;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+thead th{position:sticky;top:0;z-index:2;background:var(--surface-2);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2)}
+tbody th{position:sticky;left:0;z-index:1;background:var(--surface);text-align:left;font-weight:600}
+thead th:first-child{left:0;z-index:3;text-align:left}
+tbody tr:last-child th,tbody tr:last-child td{border-bottom:0}
+.tbl--and tbody th{white-space:normal;min-width:13rem}
+.tbl-note{margin-top:.75rem;font-size:.85rem;color:var(--ink-2)}
+
+/* Avant de commencer, FAQ, contact */
+.two{display:grid;gap:1rem}
+@media (min-width:48rem){.two{grid-template-columns:1fr 1fr}}
+.pad{padding:1.25rem;min-width:0}
+.pad h3{font-size:1.15rem;font-weight:700;margin-bottom:.4rem}
+.pad p{color:var(--ink-2)}
+.code{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-block:.9rem}
+.code__v{font-family:var(--font-mono);font-size:1.6rem;font-weight:600;padding:.25rem .7rem;border-radius:.5rem;background:var(--surface-2);user-select:all}
+.list{margin:.75rem 0 0;padding:0;list-style:none;display:grid;gap:.55rem}
+.list li{display:flex;gap:.6rem;align-items:flex-start}
+.list .ico{color:var(--accent);margin-top:.15rem}
+
+.faq{display:grid;gap:.6rem;max-width:48rem}
+.faq details{border:1px solid var(--line);border-radius:.8rem;background:var(--surface)}
+.faq summary{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.9rem 1rem;cursor:pointer;font-weight:600;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .ico{transition:transform .2s}
+.faq details[open] summary .ico{transform:rotate(180deg)}
+.faq details p{padding:0 1rem 1rem;color:var(--ink-2)}
+
+.contact{display:flex;flex-wrap:wrap;gap:1.25rem;align-items:center;justify-content:space-between;padding:1.5rem}
+.contact h2{font-size:1.5rem;font-weight:800;margin-bottom:.35rem}
+.contact p{color:var(--ink-2)}
+.contact__num{font-family:var(--font-mono);font-size:1.25rem;font-weight:600;user-select:all;margin-top:.6rem;overflow-wrap:anywhere}
+.contact__act{display:flex;flex-wrap:wrap;gap:.6rem}
+
+.foot{padding-block:2rem 5.5rem;border-top:1px solid var(--line);margin-top:2.25rem;color:var(--ink-2);font-size:.88rem}
+.foot__in{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;justify-content:space-between}
+
+.float{position:fixed;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom,0px));z-index:30;width:3.5rem;height:3.5rem;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow)}
+.float .ico{width:1.6rem;height:1.6rem}
+.float:hover{filter:brightness(1.08)}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-phone-ios" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10 5.6h4"/></symbol>
+    <symbol id="i-phone-and" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><circle cx="12" cy="5.8" r=".7" fill="currentColor"/><path d="M10 19h4"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-1.9"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7.5 18.5h9.5a4 4 0 0 0 .6-7.95 5.5 5.5 0 0 0-10.7 1.2A3.5 3.5 0 0 0 7.5 18.5z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-sim" viewBox="0 0 24 24"><path d="M8 3h7l4 4v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><rect x="9" y="11" width="6" height="6" rx="1"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></symbol>
+    <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M7 3h10M7 21h10M8 3c0 4 2 5 4 9-2 4-4 5-4 9M16 3c0 4-2 5-4 9 2 4 4 5 4 9"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/></symbol>
+    <symbol id="i-restore" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v4.5h4.5"/></symbol>
+    <symbol id="i-chip" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><circle cx="6" cy="6" r="1.6"/><circle cx="12" cy="6" r="1.6"/><circle cx="18" cy="6" r="1.6"/><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/><circle cx="6" cy="18" r="1.6"/><circle cx="12" cy="18" r="1.6"/><circle cx="18" cy="18" r="1.6"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9.2 9.2c0 3 2.6 5.6 5.6 5.6l1.1-1.3-2-1-.9.7a4 4 0 0 1-1.9-1.9l.7-.9-1-2z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.2-4.2"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  </defs>
+</svg>
+
+<div class="flagbar" aria-hidden="true"></div>
+<header class="top">
+  <div class="wrap top__in">
+    <a class="brand" href="#haut" aria-label="YOCROI PCS, accueil">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span>YOCROI <span class="brand__pcs">PCS</span></span>
+    </a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#demande">Demande</a>
+      <a href="#tarifs">Tarifs</a>
+      <a href="#avant">Avant de commencer</a>
+      <a href="#faq">Questions</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="top__act">
+      <button type="button" class="btn btn--ghost btn--icon" id="theme" aria-label="Changer de thème"></button>
+      <a class="btn btn--pri btn--cta btn--icon" id="topWa" href="#contact" target="_blank" rel="noopener noreferrer" aria-label="Écrire sur WhatsApp">
+        <svg class="ico" aria-hidden="true"><use href="#i-chat"></use></svg><span class="btn__txt">WhatsApp</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="haut">
+  <section class="hero">
+    <div class="wrap hero__grid">
+      <div>
+        <span class="label eyebrow"><svg class="ico" aria-hidden="true"><use href="#i-unlock"></use></svg>Déblocage iPhone et Android</span>
+        <h1>Déblocage de téléphones, de l'iPhone 6S au 17 Pro Max</h1>
+        <p class="hero__lead">Choisissez le type de blocage, touchez votre modèle et WhatsApp s'ouvre avec votre demande déjà rédigée. Le prix est affiché avant de commencer.</p>
+        <div class="hero__cta">
+          <a class="btn btn--pri" href="#demande">Faire une demande<svg class="ico" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+          <a class="btn btn--ghost" href="#tarifs">Voir la grille des tarifs</a>
+        </div>
+        <ul class="facts">
+          <li><svg class="ico" aria-hidden="true"><use href="#i-check"></use></svg>iPhone 6S à 17 Pro Max, iOS jusqu'à 18.2</li>
+          <li><svg class="ico" aria-hidden="true"><use href="#i-check"></use></svg>Android, toutes les versions</li>
+          <li><svg class="ico" aria-hidden="true"><use href="#i-check"></use></svg>Dès 5 000 FCFA</li>
+        </ul>
+      </div>
+      <div class="card scale" role="img" aria-label="Barème des prix : iPhone de 5 000 à 450 000 FCFA, Android de 5 000 à 25 000 FCFA">
+        <div class="scale__title"><h2>Barème</h2><span>FCFA, échelle logarithmique</span></div>
+        <div class="scale__item">
+          <div class="scale__head"><b>iPhone</b><span class="mono">5 000 à 450 000</span></div>
+          <div class="scale__track"><i style="width:100%;background:var(--accent)"></i></div>
+        </div>
+        <div class="scale__item">
+          <div class="scale__head"><b>Android</b><span class="mono">5 000 à 25 000</span></div>
+          <div class="scale__track"><i style="width:35.8%;background:var(--flag-y)"></i></div>
+        </div>
+        <div class="scale__axis" aria-hidden="true">
+          <span style="left:0">5k</span><span style="left:15.4%">10k</span><span style="left:35.8%">25k</span><span style="left:51.2%">50k</span><span style="left:66.6%">100k</span><span style="left:86.9%">250k</span><span style="left:100%">450k</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="demande" style="padding-top:1rem">
+    <div class="wrap">
+      <div class="section__head">
+        <h2>Votre demande en trois choix</h2>
+        <p>Le dernier choix ouvre WhatsApp : le message contient déjà l'appareil, la version, le service et le prix.</p>
+      </div>
+      <div class="card cfg" id="cfg">
+        <div class="step">
+          <div class="step__head"><span class="step__n">1</span><h3 class="step__t">Votre téléphone</h3></div>
+          <div class="seg">
+            <button type="button" class="seg__b" id="os-iphone" data-os="iphone" aria-pressed="true">
+              <svg class="ico" aria-hidden="true"><use href="#i-phone-ios"></use></svg>
+              <span><strong>iPhone</strong><small>6S à 17 Pro Max, iOS jusqu'à 18.2</small></span>
+            </button>
+            <button type="button" class="seg__b" id="os-android" data-os="android" aria-pressed="false">
+              <svg class="ico" aria-hidden="true"><use href="#i-phone-and"></use></svg>
+              <span><strong>Android</strong><small>Toutes les versions</small></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step__head"><span class="step__n">2</span><h3 class="step__t">Type de blocage</h3></div>
+          <div class="svcs" id="svcList" role="radiogroup" aria-label="Type de blocage"></div>
+        </div>
+
+        <div class="step">
+          <div class="step__head"><span class="step__n">3</span><h3 class="step__t" id="step3t">Votre modèle</h3></div>
+
+          <div id="paneIphone">
+            <div style="display:grid;gap:.9rem">
+              <div class="field"><span class="label">Version d'iOS</span><div class="chips" id="iosChips"></div></div>
+              <div class="search">
+                <svg class="ico" aria-hidden="true"><use href="#i-search"></use></svg>
+                <label class="sr" for="q">Rechercher un modèle</label>
+                <input class="input" id="q" type="search" placeholder="Rechercher un modèle, par exemple 13 Pro" autocomplete="off">
+              </div>
+              <div class="chips" id="genChips" aria-label="Filtrer par génération"></div>
+              <div class="note" id="iosNote" hidden><svg class="ico" aria-hidden="true"><use href="#i-info"></use></svg><span>Pour la série 17 et pour les versions d'iOS supérieures à 18.2, la disponibilité est à confirmer avec le technicien. Votre demande part quand même sur WhatsApp.</span></div>
+              <div class="hint"><svg class="ico" aria-hidden="true"><use href="#i-chat"></use></svg><span>Touchez votre modèle : WhatsApp s'ouvre avec le message prêt à envoyer.</span></div>
+              <p class="count" id="count" aria-live="polite"></p>
+              <div class="grid" id="modelGrid"></div>
+            </div>
+          </div>
+
+          <div id="paneAndroid" hidden>
+            <div style="display:grid;gap:.9rem">
+              <div class="field"><span class="label">Version d'Android</span><div class="chips" id="avChips"></div></div>
+              <div class="field">
+                <label class="label" for="am">Modèle exact (facultatif)</label>
+                <input class="input" id="am" type="text" placeholder="Par exemple Galaxy A14 ou Spark 10" autocomplete="off" maxlength="60">
+              </div>
+              <div class="hint"><svg class="ico" aria-hidden="true"><use href="#i-chat"></use></svg><span>Touchez la marque : WhatsApp s'ouvre avec le message prêt à envoyer.</span></div>
+              <div class="grid" id="brandGrid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tarifs">
+    <div class="wrap">
+      <div class="section__head">
+        <h2>Grille des tarifs</h2>
+        <p>Tous les types de blocage, pour chaque modèle d'iPhone et chaque génération d'Android. Le montant final est confirmé sur WhatsApp.</p>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Choisir la grille">
+        <button type="button" class="tab" role="tab" id="tab-iphone" data-tab="iphone" aria-selected="true">iPhone</button>
+        <button type="button" class="tab" role="tab" id="tab-android" data-tab="android" aria-selected="false">Android</button>
+      </div>
+      <div id="tblIphone" role="tabpanel" aria-labelledby="tab-iphone">
+        <div class="tbl-wrap" tabindex="0" aria-label="Tarifs iPhone par modèle et par service"><table id="tIphone"></table></div>
+        <p class="tbl-note">Prix en FCFA. Faites défiler pour voir tous les services et tous les modèles.</p>
+      </div>
+      <div id="tblAndroid" role="tabpanel" aria-labelledby="tab-android" hidden>
+        <div class="tbl-wrap" tabindex="0" aria-label="Tarifs Android par service et par version"><table class="tbl--and" id="tAndroid"></table></div>
+        <p class="tbl-note">Prix en FCFA, identiques pour toutes les marques.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="avant">
+    <div class="wrap">
+      <div class="section__head">
+        <h2>Avant de commencer</h2>
+        <p>Deux minutes de préparation rendent la réponse plus rapide.</p>
+      </div>
+      <div class="two">
+        <div class="card pad">
+          <h3>Trouver l'IMEI</h3>
+          <p>Ouvrez l'application Téléphone et composez ce code. Le numéro IMEI s'affiche à l'écran.</p>
+          <div class="code">
+            <span class="code__v">*#06#</span>
+            <button type="button" class="btn btn--ghost" data-copy="*#06#"><svg class="ico" aria-hidden="true"><use href="#i-copy"></use></svg><span>Copier</span></button>
+          </div>
+          <p>Sur iPhone débloqué, vous le trouvez aussi dans Réglages, Général, Informations.</p>
+        </div>
+        <div class="card pad">
+          <h3>Prouver que le téléphone est à vous</h3>
+          <p>Le technicien peut demander l'un de ces éléments avant de commencer.</p>
+          <ul class="list">
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"></use></svg>Facture ou reçu d'achat</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"></use></svg>Boîte d'origine portant le numéro IMEI</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"></use></svg>Votre nom et votre numéro dans la conversation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="section__head"><h2>Questions fréquentes</h2></div>
+      <div class="faq">
+        <details>
+          <summary>Quels téléphones sont pris en charge ?<svg class="ico" aria-hidden="true"><use href="#i-chevron"></use></svg></summary>
+          <p>Les iPhone du 6S au 17 Pro Max, avec iOS jusqu'à la version 18.2, et les téléphones Android de toutes les versions.</p>
+        </details>
+        <details>
+          <summary>Comment le prix est-il calculé ?<svg class="ico" aria-hidden="true"><use href="#i-chevron"></use></svg></summary>
+          <p>Pour un iPhone, le prix dépend du modèle et du type de blocage. Pour un Android, il dépend du type de blocage et de la version du système. Le prix affiché sert de base, le montant final est confirmé sur WhatsApp.</p>
+        </details>
+        <details>
+          <summary>Je ne connais pas ma version d'iOS ou d'Android.<svg class="ico" aria-hidden="true"><use href="#i-chevron"></use></svg></summary>
+          <p>Choisissez « Je ne sais pas ». Pour Android, le prix affiché commence alors au tarif le plus bas du service et le technicien vous indique le montant exact.</p>
+        </details>
+        <details>
+          <summary>Mon iPhone tourne sous une version plus récente que iOS 18.2.<svg class="ico" aria-hidden="true"><use href="#i-chevron"></use></svg></summary>
+          <p>Envoyez quand même votre demande. La disponibilité du service dépend de la version et du modèle, le technicien vous le confirme sur WhatsApp.</p>
+        </details>
+        <details>
+          <summary>Faut-il prouver que le téléphone m'appartient ?<svg class="ico" aria-hidden="true"><use href="#i-chevron"></use></svg></summary>
+          <p>Oui, le technicien peut demander une facture, la boîte d'origine ou l'IMEI. Le message prérempli contient déjà votre confirmation de propriété.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="wrap">
+      <div class="card contact">
+        <div style="min-width:0">
+          <h2>Une question avant de choisir ?</h2>
+          <p>Écrivez directement sur WhatsApp.</p>
+          <div class="contact__num" id="num"></div>
+        </div>
+        <div class="contact__act">
+          <button type="button" class="btn btn--ghost" id="copyNum" data-copy=""><svg class="ico" aria-hidden="true"><use href="#i-copy"></use></svg><span>Copier le numéro</span></button>
+          <a class="btn btn--pri" id="contactWa" href="#contact" target="_blank" rel="noopener noreferrer"><svg class="ico" aria-hidden="true"><use href="#i-chat"></use></svg>Ouvrir WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <span>&copy; 2026 YOCROI PCS</span>
+    <span>Déblocage iPhone et Android</span>
+  </div>
+</footer>
+
+<a class="float" id="floatWa" href="#contact" target="_blank" rel="noopener noreferrer" aria-label="Écrire sur WhatsApp"><svg class="ico" aria-hidden="true"><use href="#i-chat"></use></svg></a>
+
+<script>
+/* Données et prix. Tout se modifie ici. */
+/* REMPLACER par le numéro WhatsApp du propriétaire : format international, sans + ni espaces (exemple : 242061234567). */
+const CFG = { brand: "YOCROI PCS", whatsapp: "242065414564" };
+
+const PRICE_MIN = 5000, PRICE_MAX = 450000;
+
+/* Prix iPhone = prix de base du modèle (verrouillage iCloud) x coefficient du service.
+   Les bases suivent le prix de lancement et l'année de sortie de chaque modèle. Arrondi à 500 FCFA. */
+const IOS_SERVICES = [
+  { id: "passcode",   short: "Code oublié",   icon: "lock",      f: 0.30, label: "Code oublié ou iPhone désactivé",       desc: "L'écran indique « iPhone indisponible » ou « iPhone désactivé »." },
+  { id: "icloud",     short: "iCloud",        icon: "cloud",     f: 1.00, label: "Verrouillage d'activation iCloud",      desc: "L'iPhone demande un identifiant Apple que vous ne pouvez plus utiliser." },
+  { id: "mdm",        short: "MDM",           icon: "shield",    f: 0.55, label: "Gestion à distance (MDM)",              desc: "Profil d'entreprise ou d'école qui limite l'iPhone." },
+  { id: "carrier",    short: "Opérateur",     icon: "sim",       f: 0.45, label: "Déblocage opérateur (SIM)",             desc: "L'iPhone refuse les cartes SIM d'autres opérateurs." },
+  { id: "appleid",    short: "Apple ID",      icon: "user",      f: 0.40, label: "Apple ID ou mot de passe oublié",       desc: "Retrouver l'accès à votre compte Apple." },
+  { id: "screentime", short: "Temps d'écran", icon: "hourglass", f: 0.10, label: "Code Temps d'écran oublié",             desc: "Retrait du code de restrictions." },
+  { id: "backup",     short: "Sauvegarde",    icon: "archive",   f: 0.15, label: "Mot de passe de sauvegarde iTunes",     desc: "Mot de passe de sauvegarde chiffrée oublié." },
+  { id: "recovery",   short: "Logo pomme",    icon: "restore",   f: 0.12, label: "Bloqué sur la pomme ou en récupération", desc: "Réparation logicielle et restauration d'iOS." }
+];
+
+const IPHONE_GROUPS = [
+  { id: "6s", label: "6S et SE" }, { id: "7", label: "7 et 8" }, { id: "x", label: "X, XS, XR" },
+  { id: "11", label: "11" }, { id: "12", label: "12" }, { id: "13", label: "13" },
+  { id: "14", label: "14" }, { id: "15", label: "15" }, { id: "16", label: "16" }, { id: "17", label: "17" }
+];
+
+/* [nom, année, groupe, prix de base] */
+const IPHONES = [
+  ["iPhone 6S", 2015, "6s", 20000], ["iPhone 6S Plus", 2015, "6s", 22000], ["iPhone SE 1re génération", 2016, "6s", 20000],
+  ["iPhone SE 2e génération", 2020, "6s", 45000], ["iPhone SE 3e génération", 2022, "6s", 60000],
+  ["iPhone 7", 2016, "7", 25000], ["iPhone 7 Plus", 2016, "7", 28000], ["iPhone 8", 2017, "7", 30000], ["iPhone 8 Plus", 2017, "7", 35000],
+  ["iPhone X", 2017, "x", 45000], ["iPhone XR", 2018, "x", 50000], ["iPhone XS", 2018, "x", 55000], ["iPhone XS Max", 2018, "x", 65000],
+  ["iPhone 11", 2019, "11", 70000], ["iPhone 11 Pro", 2019, "11", 90000], ["iPhone 11 Pro Max", 2019, "11", 100000],
+  ["iPhone 12 mini", 2020, "12", 90000], ["iPhone 12", 2020, "12", 100000], ["iPhone 12 Pro", 2020, "12", 130000], ["iPhone 12 Pro Max", 2020, "12", 150000],
+  ["iPhone 13 mini", 2021, "13", 120000], ["iPhone 13", 2021, "13", 140000], ["iPhone 13 Pro", 2021, "13", 180000], ["iPhone 13 Pro Max", 2021, "13", 200000],
+  ["iPhone 14", 2022, "14", 190000], ["iPhone 14 Plus", 2022, "14", 200000], ["iPhone 14 Pro", 2022, "14", 250000], ["iPhone 14 Pro Max", 2022, "14", 280000],
+  ["iPhone 15", 2023, "15", 260000], ["iPhone 15 Plus", 2023, "15", 280000], ["iPhone 15 Pro", 2023, "15", 330000], ["iPhone 15 Pro Max", 2023, "15", 370000],
+  ["iPhone 16e", 2025, "16", 280000], ["iPhone 16", 2024, "16", 320000], ["iPhone 16 Plus", 2024, "16", 340000], ["iPhone 16 Pro", 2024, "16", 390000], ["iPhone 16 Pro Max", 2024, "16", 420000],
+  ["iPhone 17", 2025, "17", 380000], ["iPhone Air", 2025, "17", 410000], ["iPhone 17 Pro", 2025, "17", 430000], ["iPhone 17 Pro Max", 2025, "17", 450000]
+].map(function (r, i) { return { id: "m" + i, name: r[0], year: r[1], g: r[2], base: r[3] }; });
+
+const IOS_VERSIONS = [
+  { id: "unknown", label: "Je ne sais pas" }, { id: "15", label: "iOS 15 ou moins" }, { id: "16", label: "iOS 16" },
+  { id: "17", label: "iOS 17" }, { id: "18", label: "iOS 18 à 18.2" }, { id: "18p", label: "Plus de iOS 18.2" }
+];
+
+/* Android : prix pour [Android 9 et avant, Android 10 à 12, Android 13 et plus] */
+const ANDROID_SERVICES = [
+  { id: "schema",     short: "Écran verrouillé", icon: "grid",   p: [5000, 7500, 10000],   label: "Schéma, code PIN ou mot de passe oublié", desc: "Retrait du verrouillage de l'écran." },
+  { id: "frp",        short: "Google FRP",       icon: "key",    p: [10000, 15000, 20000], label: "Verrouillage Google (FRP)",               desc: "Le téléphone demande le compte Google après une réinitialisation." },
+  { id: "account",    short: "Compte marque",    icon: "user",   p: [15000, 20000, 25000], label: "Compte constructeur bloqué",              desc: "Samsung, Xiaomi, Huawei, Honor, Oppo et autres marques." },
+  { id: "network",    short: "Réseau SIM",       icon: "sim",    p: [7500, 10000, 12500],  label: "Déblocage réseau (SIM)",                  desc: "Le téléphone refuse les cartes SIM d'autres opérateurs." },
+  { id: "bootloader", short: "Bootloader",       icon: "chip",   p: [10000, 15000, 20000], label: "Déverrouillage du bootloader",            desc: "Autorise les modifications système avancées." },
+  { id: "kg",         short: "KG / MDM",         icon: "shield", p: [20000, 22500, 25000], label: "Verrouillage KG, Knox Guard ou MDM",      desc: "Téléphone verrouillé à distance par un financement ou une entreprise." },
+  { id: "flash",      short: "Logo / boucle",    icon: "restore",p: [5000, 7500, 10000],   label: "Bloqué sur le logo ou en boucle",         desc: "Réinstallation du système (flash)." }
+];
+
+const ANDROID_VERSIONS = [
+  { id: "a", label: "Android 9 et avant" }, { id: "b", label: "Android 10 à 12" }, { id: "c", label: "Android 13 et plus" }, { id: "unknown", label: "Je ne sais pas" }
+];
+
+const ANDROID_BRANDS = ["Samsung", "Tecno", "Infinix", "itel", "Xiaomi", "Redmi", "Huawei", "Honor", "Oppo", "Vivo", "Realme", "Motorola", "Nokia", "Google Pixel", "OnePlus", "Autre marque"];
+
+function round500(n) { return Math.round(n / 500) * 500; }
+function clampPrice(n) { return Math.min(PRICE_MAX, Math.max(PRICE_MIN, n)); }
+function iphonePrice(m, s) { return clampPrice(round500(m.base * s.f)); }
+function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var root = document.documentElement;
+  function $(s) { return document.querySelector(s); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function ico(id) { return '<svg class="ico" aria-hidden="true"><use href="#i-' + id + '"></use></svg>'; }
+  function norm(s) { return String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
+  function find(arr, id) { for (var i = 0; i < arr.length; i++) { if (arr[i].id === id) return arr[i]; } return arr[0]; }
+  function plain(n) { return fmt(n).replace(/ /g, " "); }
+  function wa(text) { return "https://wa.me/" + CFG.whatsapp + "?text=" + encodeURIComponent(text); }
+
+  var state = { os: "iphone", svc: { iphone: IOS_SERVICES[0].id, android: ANDROID_SERVICES[0].id }, ios: "unknown", gen: "all", av: "unknown" };
+
+  var CLOSING = "Je confirme être le propriétaire de l'appareil et pouvoir le justifier (facture ou boîte d'origine avec l'IMEI).\nMerci de me confirmer la disponibilité et le délai.";
+
+  function msgIphone(m, s) {
+    var v = find(IOS_VERSIONS, state.ios);
+    return ["Bonjour " + CFG.brand + ",", "Je souhaite un déblocage pour mon iPhone.", "",
+      "Appareil : " + m.name, "Version d'iOS : " + v.label, "Service : " + s.label,
+      "Prix indiqué sur le site : " + plain(iphonePrice(m, s)) + " FCFA", "", CLOSING].join("\n");
+  }
+  function avIndex() {
+    for (var i = 0; i < 3; i++) { if (ANDROID_VERSIONS[i].id === state.av) return i; }
+    return -1;
+  }
+  function msgAndroid(brand, s) {
+    var vi = avIndex();
+    var model = ($("#am").value || "").trim();
+    var price = vi < 0 ? "à partir de " + plain(s.p[0]) + " FCFA" : plain(s.p[vi]) + " FCFA";
+    return ["Bonjour " + CFG.brand + ",", "Je souhaite un déblocage pour mon téléphone Android.", "",
+      "Marque : " + brand, "Modèle : " + (model || "non précisé"),
+      "Version d'Android : " + (vi < 0 ? "Je ne sais pas" : ANDROID_VERSIONS[vi].label),
+      "Service : " + s.label, "Prix indiqué sur le site : " + price, "", CLOSING].join("\n");
+  }
+
+  function chipsHTML(items, active, attr) {
+    return items.map(function (it) {
+      return '<button type="button" class="chip" ' + attr + '="' + it.id + '" aria-pressed="' + (it.id === active) + '">' + it.label + "</button>";
+    }).join("");
+  }
+
+  var ranges = {};
+  IOS_SERVICES.forEach(function (s) {
+    var min = Infinity, max = 0;
+    IPHONES.forEach(function (m) { var p = iphonePrice(m, s); if (p < min) min = p; if (p > max) max = p; });
+    ranges[s.id] = [min, max];
+  });
+
+  function renderOS() {
+    ["iphone", "android"].forEach(function (k) { $("#os-" + k).setAttribute("aria-pressed", String(state.os === k)); });
+    $("#paneIphone").hidden = state.os !== "iphone";
+    $("#paneAndroid").hidden = state.os !== "android";
+    $("#step3t").textContent = state.os === "iphone" ? "Votre modèle" : "Votre marque";
+  }
+
+  function renderServices() {
+    var list = state.os === "iphone" ? IOS_SERVICES : ANDROID_SERVICES;
+    var cur = state.svc[state.os];
+    $("#svcList").innerHTML = list.map(function (s) {
+      var r = state.os === "iphone" ? ranges[s.id] : [s.p[0], s.p[2]];
+      return '<button type="button" class="svc" role="radio" aria-checked="' + (s.id === cur) + '" data-svc="' + s.id + '">' +
+        '<span class="svc__ico">' + ico(s.icon) + "</span>" +
+        '<span class="svc__t">' + s.label + "</span>" +
+        '<span class="svc__d">' + s.desc + "</span>" +
+        '<span class="svc__p">' + fmt(r[0]) + " à " + fmt(r[1]) + " FCFA</span></button>";
+    }).join("");
+  }
+
+  function renderIphone() {
+    $("#iosChips").innerHTML = chipsHTML(IOS_VERSIONS, state.ios, "data-ios");
+    $("#genChips").innerHTML = chipsHTML([{ id: "all", label: "Tous" }].concat(IPHONE_GROUPS), state.gen, "data-gen");
+    var s = find(IOS_SERVICES, state.svc.iphone);
+    var toks = norm($("#q").value).split(/\s+/).filter(Boolean);
+    var list = IPHONES.filter(function (m) {
+      if (state.gen !== "all" && m.g !== state.gen) return false;
+      var n = norm(m.name);
+      return toks.every(function (t) { return n.indexOf(t) > -1; });
+    });
+    $("#count").textContent = list.length + (list.length > 1 ? " modèles" : " modèle") + " pour : " + s.label;
+    $("#modelGrid").innerHTML = list.length ? list.map(function (m) {
+      return '<a class="tile" href="' + esc(wa(msgIphone(m, s))) + '" target="_blank" rel="noopener noreferrer">' + ico("arrow") +
+        '<span class="tile__n">' + m.name + "</span>" +
+        '<span class="tile__y mono">' + m.year + "</span>" +
+        '<span class="tile__p mono">' + fmt(iphonePrice(m, s)) + " FCFA</span></a>";
+    }).join("") : '<p class="empty" style="grid-column:1/-1">Aucun modèle ne correspond. Essayez « iPhone 13 » ou choisissez « Tous ».</p>';
+    $("#iosNote").hidden = !(state.ios === "18p" || state.gen === "17");
+  }
+
+  function renderAndroid() {
+    $("#avChips").innerHTML = chipsHTML(ANDROID_VERSIONS, state.av, "data-av");
+    var s = find(ANDROID_SERVICES, state.svc.android);
+    var vi = avIndex();
+    $("#brandGrid").innerHTML = ANDROID_BRANDS.map(function (b) {
+      var p = vi < 0 ? "dès " + fmt(s.p[0]) : fmt(s.p[vi]);
+      return '<a class="tile" href="' + esc(wa(msgAndroid(b, s))) + '" target="_blank" rel="noopener noreferrer">' + ico("arrow") +
+        '<span class="tile__n">' + b + "</span>" +
+        '<span class="tile__y">' + (vi < 0 ? "Version inconnue" : ANDROID_VERSIONS[vi].label) + "</span>" +
+        '<span class="tile__p mono">' + p + " FCFA</span></a>";
+    }).join("");
+  }
+
+  function update() { renderOS(); renderServices(); renderIphone(); renderAndroid(); }
+
+  function buildTables() {
+    var h = "<thead><tr><th scope=\"col\">Modèle</th>" + IOS_SERVICES.map(function (s) { return '<th scope="col">' + s.short + "</th>"; }).join("") + "</tr></thead><tbody>";
+    IPHONES.forEach(function (m) {
+      h += '<tr><th scope="row">' + m.name + "</th>" + IOS_SERVICES.map(function (s) { return '<td class="mono">' + fmt(iphonePrice(m, s)) + "</td>"; }).join("") + "</tr>";
+    });
+    $("#tIphone").innerHTML = h + "</tbody>";
+    var a = "<thead><tr><th scope=\"col\">Service</th>" + ANDROID_VERSIONS.slice(0, 3).map(function (v) { return '<th scope="col">' + v.label + "</th>"; }).join("") + "</tr></thead><tbody>";
+    ANDROID_SERVICES.forEach(function (s) {
+      a += '<tr><th scope="row">' + s.label + "</th>" + s.p.map(function (p) { return '<td class="mono">' + fmt(p) + "</td>"; }).join("") + "</tr>";
+    });
+    $("#tAndroid").innerHTML = a + "</tbody>";
+  }
+
+  /* Thème */
+  var TKEY = "yocroi-theme";
+  function effDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  function renderTheme() {
+    var d = effDark(), b = $("#theme");
+    b.innerHTML = ico(d ? "sun" : "moon");
+    b.setAttribute("aria-label", d ? "Passer au thème clair" : "Passer au thème sombre");
+  }
+  try { var saved = localStorage.getItem(TKEY); if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved); } catch (e) {}
+
+  /* Copie */
+  function copyText(txt, btn) {
+    var keep = btn.innerHTML;
+    function flash(label, icon) { btn.innerHTML = ico(icon) + "<span>" + label + "</span>"; setTimeout(function () { btn.innerHTML = keep; }, 1800); }
+    function fallback() {
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        var ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        flash(ok ? "Copié" : "Sélectionnez pour copier", ok ? "check" : "info");
+      } catch (err) { flash("Sélectionnez pour copier", "info"); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(function () { flash("Copié", "check"); }, fallback); }
+    else { fallback(); }
+  }
+
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-os],[data-svc],[data-ios],[data-gen],[data-av],[data-tab],[data-copy],#theme");
+    if (!t) return;
+    if (t.id === "theme") {
+      var next = effDark() ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem(TKEY, next); } catch (err) {}
+      renderTheme(); return;
+    }
+    if (t.hasAttribute("data-copy")) { copyText(t.getAttribute("data-copy"), t); return; }
+    if (t.hasAttribute("data-tab")) {
+      var ios = t.getAttribute("data-tab") === "iphone";
+      $("#tab-iphone").setAttribute("aria-selected", String(ios));
+      $("#tab-android").setAttribute("aria-selected", String(!ios));
+      $("#tblIphone").hidden = !ios; $("#tblAndroid").hidden = ios; return;
+    }
+    if (t.hasAttribute("data-os")) state.os = t.getAttribute("data-os");
+    else if (t.hasAttribute("data-svc")) state.svc[state.os] = t.getAttribute("data-svc");
+    else if (t.hasAttribute("data-ios")) state.ios = t.getAttribute("data-ios");
+    else if (t.hasAttribute("data-gen")) state.gen = t.getAttribute("data-gen");
+    else if (t.hasAttribute("data-av")) state.av = t.getAttribute("data-av");
+    update();
+  });
+  $("#q").addEventListener("input", renderIphone);
+  $("#am").addEventListener("input", renderAndroid);
+
+  /* Contact */
+  var generic = wa("Bonjour " + CFG.brand + ", j'ai une question sur un déblocage.");
+  ["#topWa", "#contactWa", "#floatWa"].forEach(function (id) { $(id).setAttribute("href", generic); });
+  $("#num").textContent = "+" + CFG.whatsapp;
+  $("#copyNum").setAttribute("data-copy", "+" + CFG.whatsapp);
+  if (/^2420+$/.test(CFG.whatsapp)) { console.warn("YOCROI PCS : remplacez CFG.whatsapp par le numéro WhatsApp du propriétaire."); }
+
+  buildTables();
+  update();
+  renderTheme();
+})();
+</script>
+
+</body></html>
